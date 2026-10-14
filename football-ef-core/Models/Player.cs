@@ -7,13 +7,17 @@ using System.Threading.Tasks;
 
 namespace football_ef_core.Models;
 
+/*
+ * Player Entity:
+ * all fields is required, except the training sessions
+ * age field have range
+ * M:M relation with [TrainingSessions] table
+*/ 
+
 internal class Player
 {
     public int Id { get; set; }
-
-    [Required]
-    public string Name { get; set; }
-    
-    [Required]
-    public short Age { get; set; }
+    public string Name { get; set; } = string.Empty;   
+    public byte Age { get; set; }
+    public ICollection<TrainingSession>? TrainingSessions { get; set; } = new List<TrainingSession>();
 }
