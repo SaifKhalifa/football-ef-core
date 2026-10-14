@@ -7,12 +7,15 @@ using System.Threading.Tasks;
 
 namespace football_ef_core.Models;
 
+/*
+ * Coach Entity:
+ * all fields is required, except the training sessions
+ * 1:M relation with [TrainingSessions] table
+*/
+
 internal class Coach
 {
     public int Id { get; set; }
-    
-    [Required]
-    public string Name { get; set; }
-
-    public ICollection<TrainingSession> TrainingSessions { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public ICollection<TrainingSession> TrainingSessions { get; set; } = new List<TrainingSession>();
 }
