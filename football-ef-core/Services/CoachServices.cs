@@ -41,16 +41,19 @@ internal class CoachServices
             .FirstOrDefaultAsync(c => c.Id == id);
     }
 
+    // updates the whole coach profile (name + monthly salary)
     // returns false if the coach doesn't exist
-    public async Task<bool> UpdateCoachAsync(int id, string name)
+    public async Task<bool> UpdateCoachAsync(int id, string name, decimal salary)
     {
         CheckName(name);
+        CheckSalary(salary);
 
         using var db = _factory.Create();
         var coach = await db.Coaches.FindAsync(id);
         if (coach == null) return false;
 
         coach.Name = name.Trim();
+        coach.Salary = salary;
         await db.SaveChangesAsync();
 
         return true;
@@ -71,6 +74,13 @@ internal class CoachServices
         await db.SaveChangesAsync();
 
         return true;
+    }
+
+    private static void CheckSalary(decimal salary)
+    {
+        // the column is decimal(10,2), so it holds up to 99,999,999.99
+        if (salary < 0 || salary > 99999999.99m)
+            throw new ArgumentException("Salary must be between 0 and 99,999,999.99.");
     }
 
     private static void CheckName(string name)

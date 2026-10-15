@@ -169,7 +169,7 @@ internal class Program
 
                             foreach (var c in coaches)
                             {
-                                Console.WriteLine($"[{c.Id}] {c.Name}");
+                                Console.WriteLine($"[{c.Id}] {c.Name}, salary: {c.Salary:0.00}");
                             }
 
                             if (coaches.Count == 0) Console.WriteLine("No coaches found.");
@@ -186,7 +186,7 @@ internal class Program
                             }
                             else
                             {
-                                Console.WriteLine($"[{c.Id}] {c.Name}");
+                                Console.WriteLine($"[{c.Id}] {c.Name}, salary: {c.Salary:0.00}");
 
                                 foreach (var s in c.TrainingSessions)
                                 {
@@ -210,7 +210,8 @@ internal class Program
                             bool found = await Football.Coaches.UpdateCoachAsync
                                 (
                                     GetIntInput("Coach id"),
-                                    GetStringInput("New name")
+                                    GetStringInput("New name"),
+                                    GetDecimalInput("New monthly salary")
                                 );
 
                             if (found)
@@ -435,6 +436,18 @@ internal class Program
         while (!int.TryParse(GetStringInput(label), out number))
         {
             Console.WriteLine("Please enter a whole number.");
+        }
+
+        return number;
+    }
+
+    static decimal GetDecimalInput(string label)
+    {
+        decimal number;
+
+        while (!decimal.TryParse(GetStringInput(label), out number))
+        {
+            Console.WriteLine("Please enter a valid amount, e.g. 1500 or 1500.50.");
         }
 
         return number;

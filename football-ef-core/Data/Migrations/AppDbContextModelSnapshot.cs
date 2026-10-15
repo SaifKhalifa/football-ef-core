@@ -50,9 +50,17 @@ namespace football_ef_core.Data.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("varchar(50)");
 
+                    b.Property<decimal>("Salary")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("decimal(10,2)")
+                        .HasDefaultValue(1500m);
+
                     b.HasKey("Id");
 
-                    b.ToTable("Coaches");
+                    b.ToTable("Coaches", t =>
+                        {
+                            t.HasCheckConstraint("CK_Coach_Salary_NonNegative", "`Salary` >= 0");
+                        });
                 });
 
             modelBuilder.Entity("football_ef_core.Models.Player", b =>
