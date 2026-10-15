@@ -22,6 +22,21 @@ namespace football_ef_core.Data.Migrations
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
 
+            modelBuilder.Entity("PlayerTrainingSession", b =>
+                {
+                    b.Property<int>("PlayersId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TrainingSessionsId")
+                        .HasColumnType("int");
+
+                    b.HasKey("PlayersId", "TrainingSessionsId");
+
+                    b.HasIndex("TrainingSessionsId");
+
+                    b.ToTable("PlayerSessions", (string)null);
+                });
+
             modelBuilder.Entity("football_ef_core.Models.Coach", b =>
                 {
                     b.Property<int>("Id")
@@ -32,11 +47,12 @@ namespace football_ef_core.Data.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Coach");
+                    b.ToTable("Coaches");
                 });
 
             modelBuilder.Entity("football_ef_core.Models.Player", b =>
@@ -47,21 +63,20 @@ namespace football_ef_core.Data.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<short>("Age")
-                        .HasColumnType("smallint");
+                    b.Property<byte>("Age")
+                        .HasColumnType("tinyint unsigned");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<int?>("TrainingSessionId")
-                        .HasColumnType("int");
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("TrainingSessionId");
-
-                    b.ToTable("Player");
+                    b.ToTable("Players", t =>
+                        {
+                            t.HasCheckConstraint("CK_Player_Age_Range", "`Age` BETWEEN 1 AND 50");
+                        });
                 });
 
             modelBuilder.Entity("football_ef_core.Models.TrainingSession", b =>
@@ -76,11 +91,14 @@ namespace football_ef_core.Data.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime>("Date")
-                        .HasColumnType("datetime(6)");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime(6)")
+                        .HasDefaultValueSql("(CURRENT_DATE)");
 
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasColumnType("varchar(255)");
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
 
                     b.HasKey("Id");
 
@@ -89,14 +107,22 @@ namespace football_ef_core.Data.Migrations
                     b.HasIndex("Title")
                         .IsUnique();
 
-                    b.ToTable("TrainingSession");
+                    b.ToTable("TrainingSessions");
                 });
 
-            modelBuilder.Entity("football_ef_core.Models.Player", b =>
+            modelBuilder.Entity("PlayerTrainingSession", b =>
                 {
+                    b.HasOne("football_ef_core.Models.Player", null)
+                        .WithMany()
+                        .HasForeignKey("PlayersId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("football_ef_core.Models.TrainingSession", null)
-                        .WithMany("Players")
-                        .HasForeignKey("TrainingSessionId");
+                        .WithMany()
+                        .HasForeignKey("TrainingSessionsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("football_ef_core.Models.TrainingSession", b =>
@@ -104,7 +130,7 @@ namespace football_ef_core.Data.Migrations
                     b.HasOne("football_ef_core.Models.Coach", "Coach")
                         .WithMany("TrainingSessions")
                         .HasForeignKey("CoachId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Coach");
@@ -113,11 +139,6 @@ namespace football_ef_core.Data.Migrations
             modelBuilder.Entity("football_ef_core.Models.Coach", b =>
                 {
                     b.Navigation("TrainingSessions");
-                });
-
-            modelBuilder.Entity("football_ef_core.Models.TrainingSession", b =>
-                {
-                    b.Navigation("Players");
                 });
 #pragma warning restore 612, 618
         }
