@@ -54,6 +54,14 @@ internal class AppDbContext : DbContext
                 p.Property(n => n.Name)
                 .HasMaxLength(50)
                 .IsRequired();
+
+                // monthly salary: up to 99,999,999.99, starts at 1500 for every new/existing coach
+                p.Property(s => s.Salary)
+                .HasColumnType("decimal(10,2)")
+                .HasDefaultValue(1500m)
+                .IsRequired();
+
+                p.ToTable(t => t.HasCheckConstraint("CK_Coach_Salary_NonNegative", "`Salary` >= 0"));
             });
 
         // 1:M relation, each coach have more than one training sesison, and each training session have one coach.
