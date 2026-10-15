@@ -11,7 +11,7 @@ namespace football_ef_core.Data;
 
 internal class AppDbContext : DbContext
 {
-    public string MySQLConnectionString = Environment.GetEnvironmentVariable("ConnectionStrings_MySQL");
+    public string MySQLConnectionString = Environment.GetEnvironmentVariable("ConnectionStrings__MySQL");
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -80,10 +80,14 @@ internal class AppDbContext : DbContext
             });
 
 
-        // setting default delete foreign key behavior to all entities
-        foreach (var fk in modelBuilder.Model.GetEntityTypes()
-             .Where(e => !e.IsPropertyBag)           // skips the PlayerSessions join entity
-             .SelectMany(e => e.GetForeignKeys()))
+        // setting default delete foreign key behavior to all entities, except the join table
+
+        foreach 
+            (
+                var fk in modelBuilder.Model.GetEntityTypes()
+                .Where(e => !e.IsPropertyBag)           // skips the PlayerSessions join entity
+                .SelectMany(e => e.GetForeignKeys())
+            )
         {
             fk.DeleteBehavior = DeleteBehavior.Restrict;
         }
